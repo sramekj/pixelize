@@ -17,7 +17,7 @@ I use it for my games.
 #### Example transformations 
 source image  
 ![alt text](libcrate/assets/test_img_1.jpg)  
-4 colors with generated palette, uniform 100px width  
+8 colors with generated palette, uniform 100px width  
 ![alt text](libcrate/assets/converted1.png)  
 source image  
 ![alt text](libcrate/assets/test_img_2.jpg)  

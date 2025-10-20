@@ -625,6 +625,7 @@ dependencies = [
  "color_quant",
  "image",
  "kiddo",
+ "rayon",
 ]
 
 [[package]]

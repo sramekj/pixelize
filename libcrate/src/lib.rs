@@ -79,17 +79,25 @@ pub mod image_processing {
     use image::imageops::FilterType;
     use image::{Rgb, RgbImage};
     use kiddo::{KdTree, SquaredEuclidean};
+    use rayon::prelude::*;
     use std::collections::HashMap;
     use std::path::Path;
 
     type Point = [f64; 3];
 
     pub fn get_color_histogram(data: &RgbImage) -> RgbHistogram {
-        let mut histogram = HashMap::new();
-        for pixel in data.pixels() {
-            *histogram.entry(*pixel).or_insert(0u32) += 1;
-        }
-        histogram
+        data.pixels()
+            .par_bridge()
+            .fold(HashMap::new, |mut local_map, pixel| {
+                *local_map.entry(*pixel).or_insert(0) += 1;
+                local_map
+            })
+            .reduce(HashMap::new, |mut map1, map2| {
+                for (k, v) in map2 {
+                    *map1.entry(k).or_insert(0) += v;
+                }
+                map1
+            })
     }
 
     pub fn generate_image_palette(
@@ -171,6 +179,8 @@ pub mod image_processing {
 mod tests {
     use crate::ProcessedImage;
     use crate::image_processing::save_palette;
+    use image::Rgb;
+    use std::collections::HashMap;
 
     #[test]
     #[ignore]
@@ -180,6 +190,15 @@ mod tests {
         let histogram = image.get_color_histogram();
         println!("Histogram: {:?}", histogram);
         assert_eq!(histogram.len(), 6);
+        let expected = HashMap::from([
+            (Rgb([136, 0, 21]), 30),
+            (Rgb([185, 122, 87]), 10),
+            (Rgb([255, 242, 0]), 15),
+            (Rgb([34, 177, 76]), 10),
+            (Rgb([63, 72, 204]), 21),
+            (Rgb([0, 0, 0]), 14),
+        ]);
+        assert_eq!(histogram, expected);
     }
 
     #[test]
@@ -187,7 +206,7 @@ mod tests {
     fn test_palette_and_scaling() {
         let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
         println!("Dimensions: {}x{}", image.width(), image.height());
-        let palette = image.generate_image_palette(10, 4);
+        let palette = image.generate_image_palette(10, 8);
         println!("Palette: {:?}", palette);
         save_palette("./assets/palette.png", &palette).unwrap();
         image.apply_palette(&palette);
