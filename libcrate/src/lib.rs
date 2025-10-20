@@ -127,12 +127,19 @@ pub mod image_processing {
             color_map.insert(item, *color);
         }
         let (width, height) = img.dimensions();
+        let processed_pixels: Vec<(u32, u32, Rgb<u8>)> = img
+            .enumerate_pixels()
+            .par_bridge()
+            .map(|(x, y, pixel)| {
+                let point = rgb_to_point(pixel);
+                let nearest = tree.nearest_one::<SquaredEuclidean>(&point);
+                let nearest_color = color_map[&nearest.item];
+                (x, y, nearest_color)
+            })
+            .collect();
         let mut new_img = RgbImage::new(width, height);
-        for (x, y, pixel) in img.enumerate_pixels() {
-            let point = rgb_to_point(pixel);
-            let nearest = tree.nearest_one::<SquaredEuclidean>(&point);
-            let nearest_color = color_map[&nearest.item];
-            new_img.put_pixel(x, y, nearest_color);
+        for (x, y, color) in processed_pixels {
+            new_img.put_pixel(x, y, color);
         }
         new_img
     }
