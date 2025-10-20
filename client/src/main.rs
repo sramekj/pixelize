@@ -3,7 +3,8 @@ mod config;
 use crate::config::Config;
 use anyhow::{Result, anyhow};
 use clap::Parser;
-use libcrate::{Image, ImageProcessor, Palette, PaletteFromVec};
+use libcrate::ProcessedImage;
+use libcrate::image_processing::{palette_from_tuples, save_palette};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -24,12 +25,12 @@ fn main() -> Result<()> {
         return Err(anyhow!("Config is not valid."));
     }
     println!("Loading image...");
-    let mut image = Image::new(args.filename)?;
+    let mut image = ProcessedImage::new(args.filename)?;
     println!("Processing image...");
 
     let palette = if config.use_custom_palette {
         println!("Using custom palette...");
-        Palette::from_vec(config.custom_palette)
+        palette_from_tuples(&config.custom_palette)
     } else {
         println!("Generating palette...");
         image.generate_image_palette(
@@ -40,7 +41,7 @@ fn main() -> Result<()> {
 
     if args.dump_palette {
         println!("Saving palette to palette.png");
-        ImageProcessor::save_palette("./palette.png", &palette)?;
+        save_palette("./palette.png", &palette)?;
     }
 
     println!("Applying palette...");
