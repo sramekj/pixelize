@@ -3,7 +3,7 @@ mod config;
 use crate::config::Config;
 use anyhow::{Result, anyhow};
 use clap::Parser;
-use libcrate::{Image, Palette, PaletteFromVec};
+use libcrate::{Image, ImageProcessor, Palette, PaletteFromVec};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -12,6 +12,8 @@ struct Args {
     filename: String,
     #[arg(short = 'o', long)]
     output: String,
+    #[arg(long = "dump-palette", default_value = "false")]
+    dump_palette: bool,
 }
 
 fn main() -> Result<()> {
@@ -35,6 +37,11 @@ fn main() -> Result<()> {
             config.number_of_colors.unwrap(),
         )
     };
+
+    if args.dump_palette {
+        println!("Saving palette to palette.png");
+        ImageProcessor::save_palette("./palette.png", &palette)?;
+    }
 
     println!("Applying palette...");
     image.apply_palette(&palette);

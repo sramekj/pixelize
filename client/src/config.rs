@@ -25,7 +25,7 @@ impl Default for Config {
             uniform_scale_by_width: false,
             uniform_scale_by_height: false,
             use_custom_palette: false,
-            custom_palette: vec![],
+            custom_palette: vec![(1, 1, 1), (2, 2, 2)],
         }
     }
 }
@@ -72,7 +72,7 @@ impl Config {
             && (self.desired_width.is_none() || self.desired_height.is_none())
         {
             validation_messages.push(
-                "Warning: invalid configuration: desired_width and desired_height are missing."
+                "Warning: invalid configuration: desired_width or desired_height are missing."
                     .to_string(),
             );
         }

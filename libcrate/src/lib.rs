@@ -174,13 +174,13 @@ mod tests {
     #[test]
     #[ignore]
     fn test_palette_and_scaling() {
-        let mut image = Image::new("./assets/test_img_2.jpg").unwrap();
+        let mut image = Image::new("./assets/test_img_1.jpg").unwrap();
         println!("Dimensions: {}x{}", image.width, image.height);
-        let palette = image.generate_image_palette(10, 8);
+        let palette = image.generate_image_palette(10, 4);
         println!("Palette: {:?}", palette);
         ImageProcessor::save_palette("./assets/palette.png", &palette).unwrap();
         image.apply_palette(&palette);
         image.uniform_scale_width(100);
-        image.save("./assets/converted.png").unwrap();
+        image.save("./assets/converted1.png").unwrap();
     }
 }
