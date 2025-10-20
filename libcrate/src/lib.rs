@@ -8,11 +8,8 @@ use std::path::Path;
 
 pub type RgbHistogram = HashMap<Rgb<u8>, u32>;
 pub type Palette = Vec<Rgb<u8>>;
-type Point = [f64; 3];
 
 pub struct ProcessedImage {
-    width: u32,
-    height: u32,
     data: RgbImage,
 }
 
@@ -26,11 +23,7 @@ impl ProcessedImage {
             .decode()
             .with_context(|| "Failed to decode the file")?
             .to_rgb8();
-        Ok(ProcessedImage {
-            width: data.width(),
-            height: data.height(),
-            data,
-        })
+        Ok(ProcessedImage { data })
     }
 
     pub fn get_color_histogram(&self) -> RgbHistogram {
@@ -50,14 +43,16 @@ impl ProcessedImage {
     }
 
     pub fn uniform_scale_width(&mut self, new_width: u32) {
-        let ratio = new_width as f64 / self.width as f64;
-        let new_height = (self.height as f64 * ratio) as u32;
+        let (width, height) = self.data.dimensions();
+        let ratio = new_width as f64 / width as f64;
+        let new_height = (height as f64 * ratio) as u32;
         self.scale(new_width, new_height);
     }
 
     pub fn uniform_scale_height(&mut self, new_height: u32) {
-        let ratio = new_height as f64 / self.height as f64;
-        let new_width = (self.width as f64 * ratio) as u32;
+        let (width, height) = self.data.dimensions();
+        let ratio = new_height as f64 / height as f64;
+        let new_width = (width as f64 * ratio) as u32;
         self.scale(new_width, new_height);
     }
 
@@ -67,10 +62,18 @@ impl ProcessedImage {
     {
         save_image(path.as_ref(), &self.data)
     }
+
+    pub fn width(&self) -> u32 {
+        self.data.width()
+    }
+
+    pub fn height(&self) -> u32 {
+        self.data.height()
+    }
 }
 
 pub mod image_processing {
-    use crate::{Palette, Point, RgbHistogram};
+    use crate::{Palette, RgbHistogram};
     use anyhow::{Context, Result};
     use color_quant::NeuQuant;
     use image::imageops::FilterType;
@@ -79,10 +82,12 @@ pub mod image_processing {
     use std::collections::HashMap;
     use std::path::Path;
 
+    type Point = [f64; 3];
+
     pub fn get_color_histogram(data: &RgbImage) -> RgbHistogram {
         let mut histogram = HashMap::new();
-        for pixel in data.enumerate_pixels() {
-            *histogram.entry(*pixel.2).or_insert(0u32) += 1;
+        for pixel in data.pixels() {
+            *histogram.entry(*pixel).or_insert(0u32) += 1;
         }
         histogram
     }
@@ -171,7 +176,7 @@ mod tests {
     #[ignore]
     fn test_histogram() {
         let image = ProcessedImage::new("./assets/test_img_2.png").unwrap();
-        println!("Dimensions: {}x{}", image.width, image.height);
+        println!("Dimensions: {}x{}", image.width(), image.height());
         let histogram = image.get_color_histogram();
         println!("Histogram: {:?}", histogram);
         assert_eq!(histogram.len(), 6);
@@ -181,7 +186,7 @@ mod tests {
     #[ignore]
     fn test_palette_and_scaling() {
         let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
-        println!("Dimensions: {}x{}", image.width, image.height);
+        println!("Dimensions: {}x{}", image.width(), image.height());
         let palette = image.generate_image_palette(10, 4);
         println!("Palette: {:?}", palette);
         save_palette("./assets/palette.png", &palette).unwrap();
