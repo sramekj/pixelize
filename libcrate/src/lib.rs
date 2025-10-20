@@ -26,6 +26,16 @@ impl ProcessedImage {
         Ok(ProcessedImage { data })
     }
 
+    pub fn from_buffer(width: u32, height: u32, buffer: &[Rgb<u8>]) -> Self {
+        let mut data = RgbImage::new(width, height);
+        let mut idx = 0;
+        data.pixels_mut().for_each(|px| {
+            *px = buffer[idx];
+            idx += 1;
+        });
+        ProcessedImage { data }
+    }
+
     pub fn get_color_histogram(&self) -> RgbHistogram {
         get_color_histogram(&self.data)
     }
@@ -188,11 +198,133 @@ mod tests {
     use crate::image_processing::save_palette;
     use image::Rgb;
     use std::collections::HashMap;
+    use std::fs;
+    use std::path::Path;
+
+    #[allow(dead_code)]
+    fn generate_img_code<P>(path: P, output: P)
+    where
+        P: AsRef<Path>,
+    {
+        let image = ProcessedImage::new(path).unwrap();
+        let pixels = image.data.pixels().map(|p| p.0).collect::<Vec<_>>();
+        let data_str = pixels
+            .iter()
+            .map(|p| format!("Rgb([{},{},{}])", p[0], p[1], p[2]))
+            .collect::<Vec<_>>()
+            .join(", ");
+        fs::write(output, format!("let img_data = [{}];", data_str)).unwrap();
+    }
+
+    fn get_test_image() -> ProcessedImage {
+        let img_data = [
+            Rgb([136u8, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([0, 0, 0]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([185, 122, 87]),
+            Rgb([185, 122, 87]),
+            Rgb([34, 177, 76]),
+            Rgb([34, 177, 76]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([185, 122, 87]),
+            Rgb([185, 122, 87]),
+            Rgb([34, 177, 76]),
+            Rgb([34, 177, 76]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([185, 122, 87]),
+            Rgb([185, 122, 87]),
+            Rgb([34, 177, 76]),
+            Rgb([34, 177, 76]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([185, 122, 87]),
+            Rgb([185, 122, 87]),
+            Rgb([34, 177, 76]),
+            Rgb([34, 177, 76]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([255, 242, 0]),
+            Rgb([185, 122, 87]),
+            Rgb([185, 122, 87]),
+            Rgb([34, 177, 76]),
+            Rgb([34, 177, 76]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([136, 0, 21]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+            Rgb([63, 72, 204]),
+        ];
+        ProcessedImage::from_buffer(10, 10, &img_data)
+    }
 
     #[test]
-    #[ignore]
     fn test_histogram() {
-        let image = ProcessedImage::new("./assets/test_img_2.png").unwrap();
+        let image = get_test_image();
         println!("Dimensions: {}x{}", image.width(), image.height());
         let histogram = image.get_color_histogram();
         println!("Histogram: {:?}", histogram);
