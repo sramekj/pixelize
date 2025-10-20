@@ -341,8 +341,55 @@ mod tests {
     }
 
     #[test]
+    fn test_scaling() {
+        let mut image = get_test_image();
+        image.scale(100, 100);
+        assert_eq!(image.width(), 100);
+        assert_eq!(image.height(), 100);
+        image.uniform_scale_width(50);
+        assert_eq!(image.width(), 50);
+        assert_eq!(image.height(), 50);
+        image.uniform_scale_height(70);
+        assert_eq!(image.width(), 70);
+        assert_eq!(image.height(), 70);
+    }
+
+    #[test]
+    fn test_palette_gen() {
+        let image = get_test_image();
+        let palette = image.generate_image_palette(10, 6);
+        let expected_palette = [
+            Rgb([239, 0, 180]),
+            Rgb([117, 21, 17]),
+            Rgb([7, 27, 143]),
+            Rgb([171, 171, 171]),
+            Rgb([93, 177, 123]),
+            Rgb([213, 213, 213]),
+        ];
+        assert_eq!(palette, expected_palette);
+    }
+
+    #[test]
+    fn test_apply_palette() {
+        let buffer = [
+            Rgb([0xFFu8, 0xFF, 0xFF]),
+            Rgb([0x88, 0x88, 0x88]),
+            Rgb([0x22, 0x22, 0x22]),
+            Rgb([0, 0, 0]),
+        ];
+        let mut image = ProcessedImage::from_buffer(2, 2, &buffer);
+        let palette = vec![Rgb([0u8, 0, 0]), Rgb([0x90, 0x90, 0x90])];
+        image.apply_palette(&palette);
+        let expected = [0x90u8, 0x90, 0x90, 0x90, 0x90, 0x90, 0, 0, 0, 0, 0, 0]
+            .into_iter()
+            .collect::<Vec<_>>();
+        let data = image.data.as_raw();
+        assert_eq!(data, &expected);
+    }
+
+    #[test]
     #[ignore]
-    fn test_palette_and_scaling() {
+    fn end_to_end() {
         let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
         println!("Dimensions: {}x{}", image.width(), image.height());
         let palette = image.generate_image_palette(10, 8);
