@@ -25,7 +25,7 @@ impl Default for Config {
             uniform_scale_by_width: false,
             uniform_scale_by_height: false,
             use_custom_palette: false,
-            custom_palette: vec![(1, 1, 1), (2, 2, 2)],
+            custom_palette: vec![],
         }
     }
 }
