@@ -26,7 +26,20 @@ fn main() -> Result<()> {
     }
     println!("Loading image...");
     let mut image = ProcessedImage::new(args.filename)?;
-    println!("Processing image...");
+
+    if config.uniform_scale_by_width {
+        println!("Uniform scaling by width...");
+        image.uniform_scale_width(config.desired_width.unwrap());
+    } else if config.uniform_scale_by_height {
+        println!("Uniform scaling by height...");
+        image.uniform_scale_height(config.desired_height.unwrap());
+    } else {
+        println!("Scaling by width and height...");
+        image.scale(
+            config.desired_width.unwrap(),
+            config.desired_height.unwrap(),
+        );
+    }
 
     let palette = if config.use_custom_palette {
         println!("Using custom palette...");
@@ -46,20 +59,6 @@ fn main() -> Result<()> {
 
     println!("Applying palette...");
     image.apply_palette(&palette);
-
-    if config.uniform_scale_by_width {
-        println!("Uniform scaling by width...");
-        image.uniform_scale_width(config.desired_width.unwrap());
-    } else if config.uniform_scale_by_height {
-        println!("Uniform scaling by height...");
-        image.uniform_scale_height(config.desired_height.unwrap());
-    } else {
-        println!("Scaling by width and height...");
-        image.scale(
-            config.desired_width.unwrap(),
-            config.desired_height.unwrap(),
-        );
-    }
 
     println!("Saving to {}", args.output);
     image.save(&args.output)?;

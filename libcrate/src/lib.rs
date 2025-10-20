@@ -2,6 +2,7 @@ use crate::image_processing::{
     apply_palette, generate_image_palette, get_color_histogram, save_image, scale,
 };
 use anyhow::{Context, Result};
+use image::imageops::FilterType;
 use image::{ImageReader, Rgb, RgbImage};
 use std::collections::HashMap;
 use std::path::Path;
@@ -49,7 +50,7 @@ impl ProcessedImage {
     }
 
     pub fn scale(&mut self, new_width: u32, new_height: u32) {
-        self.data = scale(&self.data, new_width, new_height);
+        self.data = scale(&self.data, new_width, new_height, FilterType::Lanczos3);
     }
 
     pub fn uniform_scale_width(&mut self, new_width: u32) {
@@ -154,8 +155,8 @@ pub mod image_processing {
         new_img
     }
 
-    pub fn scale(img: &RgbImage, new_width: u32, new_height: u32) -> RgbImage {
-        image::imageops::resize(img, new_width, new_height, FilterType::Nearest)
+    pub fn scale(img: &RgbImage, new_width: u32, new_height: u32, filter: FilterType) -> RgbImage {
+        image::imageops::resize(img, new_width, new_height, filter)
     }
 
     pub fn save_palette<P>(path: P, palette: &Palette) -> Result<()>
@@ -390,13 +391,36 @@ mod tests {
     #[test]
     #[ignore]
     fn end_to_end() {
-        let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
-        println!("Dimensions: {}x{}", image.width(), image.height());
-        let palette = image.generate_image_palette(10, 8);
-        println!("Palette: {:?}", palette);
-        save_palette("./assets/palette.png", &palette).unwrap();
-        image.apply_palette(&palette);
-        image.uniform_scale_width(100);
-        image.save("./assets/converted1.png").unwrap();
+        let scale_before = true;
+        {
+            let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
+            println!("Dimensions: {}x{}", image.width(), image.height());
+            if scale_before {
+                image.uniform_scale_width(100);
+            }
+            let palette = image.generate_image_palette(10, 8);
+            println!("Palette: {:?}", palette);
+            save_palette("./assets/palette1.png", &palette).unwrap();
+            image.apply_palette(&palette);
+            if !scale_before {
+                image.uniform_scale_width(100);
+            }
+            image.save("./assets/converted1.png").unwrap();
+        }
+        {
+            let mut image = ProcessedImage::new("./assets/test_img_2.jpg").unwrap();
+            println!("Dimensions: {}x{}", image.width(), image.height());
+            if scale_before {
+                image.uniform_scale_width(100);
+            }
+            let palette = image.generate_image_palette(10, 8);
+            println!("Palette: {:?}", palette);
+            save_palette("./assets/palette2.png", &palette).unwrap();
+            image.apply_palette(&palette);
+            if !scale_before {
+                image.uniform_scale_width(100);
+            }
+            image.save("./assets/converted2.png").unwrap();
+        }
     }
 }
