@@ -2,5 +2,10 @@
 name = "libcrate"
 version = "0.1.0"
 edition = "2024"
+authors = ["srama"]
 
 [dependencies]
+anyhow = "1.0.100"
+color_quant = "1.1.0"
+image = "0.25.8"
+kiddo = "5.2.2"
