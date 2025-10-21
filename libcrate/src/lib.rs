@@ -413,6 +413,15 @@ mod tests {
             image.save("./assets/converted1.png").unwrap();
         }
         {
+            let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
+            println!("Dimensions: {}x{}", image.width(), image.height());
+            let orig_width = image.width().clone();
+            image.uniform_scale_width(orig_width / 2, true);
+            let palette = image.generate_image_palette(10, 8);
+            image.apply_palette(&palette);
+            image.save("./assets/converted3.png").unwrap();
+        }
+        {
             let mut image = ProcessedImage::new("./assets/test_img_2.jpg").unwrap();
             println!("Dimensions: {}x{}", image.width(), image.height());
             let orig_width = image.width().clone();
@@ -423,6 +432,15 @@ mod tests {
             image.apply_palette(&palette);
             image.uniform_scale_width(orig_width, false);
             image.save("./assets/converted2.png").unwrap();
+        }
+        {
+            let mut image = ProcessedImage::new("./assets/test_img_2.jpg").unwrap();
+            println!("Dimensions: {}x{}", image.width(), image.height());
+            let orig_width = image.width().clone();
+            image.uniform_scale_width(orig_width / 2, true);
+            let palette = image.generate_image_palette(10, 8);
+            image.apply_palette(&palette);
+            image.save("./assets/converted4.png").unwrap();
         }
     }
 }

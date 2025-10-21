@@ -19,10 +19,14 @@ source image
 ![alt text](libcrate/assets/test_img_1.jpg)  
 16 colors with generated palette  
 ![alt text](libcrate/assets/converted1.png)  
+8 colors with generated palette, downscaled to 50 %  
+![alt text](libcrate/assets/converted3.png)  
 source image  
 ![alt text](libcrate/assets/test_img_2.jpg)  
 16 colors with generated palette  
 ![alt text](libcrate/assets/converted2.png)  
+8 colors with generated palette, downscaled to 50 %  
+![alt text](libcrate/assets/converted4.png)  
 
 ### Usage 
 `pixelize --input <INPUT_FILE> --output <OUTPUT_FILE>` or  
