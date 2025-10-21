@@ -17,17 +17,17 @@ I use it for my games.
 #### Example transformations 
 source image  
 ![alt text](libcrate/assets/test_img_1.jpg)  
-8 colors with generated palette, uniform 100px width  
+16 colors with generated palette  
 ![alt text](libcrate/assets/converted1.png)  
 source image  
 ![alt text](libcrate/assets/test_img_2.jpg)  
-8 colors with generated palette, uniform 100px width  
+16 colors with generated palette  
 ![alt text](libcrate/assets/converted2.png)  
 
 ### Usage 
-`pixelize --filename <FILENAME> --output <OUTPUT>` 
-
-`--dump-palette` will dump the palette into palette.png  
+`pixelize --input <INPUT_FILE> --output <OUTPUT_FILE>` or  
+`pixelize -i <INPUT_FILE> -o <OUTPUT_FILE>` or  
+`pixelize <INPUT_FILE> <OUTPUT_FILE>`
 
 For more information, try `--help`.  
 
@@ -54,3 +54,5 @@ only used when `use_custom_palette=false`, is used for palette generation
 an array of RGB colors, could be defined like this:  
   `custom_palette = [[255, 0, 0], [0, 255, 0], [0, 0, 255], [0, 0, 0]]`  
 this defines 4 color palette with red, green, blue and black colors.  
+- **dump-palette**  
+will dump the palette into palette.png  

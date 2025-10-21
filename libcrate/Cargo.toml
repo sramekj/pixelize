@@ -3,6 +3,9 @@ name = "libcrate"
 version = "0.1.0"
 edition = "2024"
 authors = ["srama"]
+description = "Converts images to pixel art (kinda...)"
+license = "MIT"
+repository = "https://github.com/sramekj/pixelize"
 
 [dependencies]
 anyhow = "1.0.100"

@@ -11,7 +11,7 @@ pub type RgbHistogram = HashMap<Rgb<u8>, u32>;
 pub type Palette = Vec<Rgb<u8>>;
 
 pub struct ProcessedImage {
-    data: RgbImage,
+    pub data: RgbImage,
 }
 
 impl ProcessedImage {
@@ -49,22 +49,31 @@ impl ProcessedImage {
         self.data = apply_palette(&self.data, palette);
     }
 
-    pub fn scale(&mut self, new_width: u32, new_height: u32) {
-        self.data = scale(&self.data, new_width, new_height, FilterType::Lanczos3);
+    pub fn scale(&mut self, new_width: u32, new_height: u32, smooth: bool) {
+        self.data = scale(
+            &self.data,
+            new_width,
+            new_height,
+            if smooth {
+                FilterType::Lanczos3
+            } else {
+                FilterType::Nearest
+            },
+        );
     }
 
-    pub fn uniform_scale_width(&mut self, new_width: u32) {
+    pub fn uniform_scale_width(&mut self, new_width: u32, smooth: bool) {
         let (width, height) = self.data.dimensions();
         let ratio = new_width as f64 / width as f64;
         let new_height = (height as f64 * ratio) as u32;
-        self.scale(new_width, new_height);
+        self.scale(new_width, new_height, smooth);
     }
 
-    pub fn uniform_scale_height(&mut self, new_height: u32) {
+    pub fn uniform_scale_height(&mut self, new_height: u32, smooth: bool) {
         let (width, height) = self.data.dimensions();
         let ratio = new_height as f64 / height as f64;
         let new_width = (width as f64 * ratio) as u32;
-        self.scale(new_width, new_height);
+        self.scale(new_width, new_height, smooth);
     }
 
     pub fn save<P>(&self, path: P) -> Result<()>
@@ -344,13 +353,13 @@ mod tests {
     #[test]
     fn test_scaling() {
         let mut image = get_test_image();
-        image.scale(100, 100);
+        image.scale(100, 100, true);
         assert_eq!(image.width(), 100);
         assert_eq!(image.height(), 100);
-        image.uniform_scale_width(50);
+        image.uniform_scale_width(50, true);
         assert_eq!(image.width(), 50);
         assert_eq!(image.height(), 50);
-        image.uniform_scale_height(70);
+        image.uniform_scale_height(70, true);
         assert_eq!(image.width(), 70);
         assert_eq!(image.height(), 70);
     }
@@ -391,35 +400,28 @@ mod tests {
     #[test]
     #[ignore]
     fn end_to_end() {
-        let scale_before = true;
         {
             let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
             println!("Dimensions: {}x{}", image.width(), image.height());
-            if scale_before {
-                image.uniform_scale_width(100);
-            }
-            let palette = image.generate_image_palette(10, 8);
+            let orig_width = image.width().clone();
+            image.uniform_scale_width(orig_width / 5, true);
+            let palette = image.generate_image_palette(10, 16);
             println!("Palette: {:?}", palette);
             save_palette("./assets/palette1.png", &palette).unwrap();
             image.apply_palette(&palette);
-            if !scale_before {
-                image.uniform_scale_width(100);
-            }
+            image.uniform_scale_width(orig_width, false);
             image.save("./assets/converted1.png").unwrap();
         }
         {
             let mut image = ProcessedImage::new("./assets/test_img_2.jpg").unwrap();
             println!("Dimensions: {}x{}", image.width(), image.height());
-            if scale_before {
-                image.uniform_scale_width(100);
-            }
-            let palette = image.generate_image_palette(10, 8);
+            let orig_width = image.width().clone();
+            image.uniform_scale_width(orig_width / 5, true);
+            let palette = image.generate_image_palette(10, 16);
             println!("Palette: {:?}", palette);
             save_palette("./assets/palette2.png", &palette).unwrap();
             image.apply_palette(&palette);
-            if !scale_before {
-                image.uniform_scale_width(100);
-            }
+            image.uniform_scale_width(orig_width, false);
             image.save("./assets/converted2.png").unwrap();
         }
     }

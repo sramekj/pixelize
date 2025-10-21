@@ -12,6 +12,7 @@ pub struct Config {
     pub uniform_scale_by_width: bool,
     pub uniform_scale_by_height: bool,
     pub use_custom_palette: bool,
+    pub dump_palette: bool,
     pub custom_palette: Vec<(u8, u8, u8)>,
 }
 
@@ -25,6 +26,7 @@ impl Default for Config {
             uniform_scale_by_width: false,
             uniform_scale_by_height: false,
             use_custom_palette: false,
+            dump_palette: false,
             custom_palette: vec![],
         }
     }
@@ -67,20 +69,17 @@ impl Config {
             validation_messages
                 .push("Warning: invalid configuration: custom_palette is empty.".to_string());
         };
-        if !self.uniform_scale_by_width
-            && !self.uniform_scale_by_height
-            && (self.desired_width.is_none() || self.desired_height.is_none())
-        {
+        if self.uniform_scale_by_width && self.uniform_scale_by_height {
             validation_messages.push(
-                "Warning: invalid configuration: desired_width or desired_height are missing."
+                "Warning: invalid configuration: cannot have both uniform scaling enabled."
                     .to_string(),
             );
         }
-        if !self.uniform_scale_by_width && self.desired_width.is_none() {
+        if self.uniform_scale_by_width && self.desired_width.is_none() {
             validation_messages
                 .push("Warning: invalid configuration: desired_width is missing.".to_string());
         }
-        if !self.uniform_scale_by_height && self.desired_height.is_none() {
+        if self.uniform_scale_by_height && self.desired_height.is_none() {
             validation_messages
                 .push("Warning: invalid configuration: desired_height is missing.".to_string());
         }
