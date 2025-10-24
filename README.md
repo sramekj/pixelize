@@ -1,6 +1,6 @@
 # Pixelize
 
-### Description
+[![github actions](https://github.com/sramekj/pixelize/workflows/CI/badge.svg)](https://github.com/sramekj/pixelize/actions)
 
 Converts input images (jpg/png/bmp...) to "pixel-art" images (kinda...).  
 I use it for my games. 

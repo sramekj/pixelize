@@ -403,7 +403,7 @@ mod tests {
         {
             let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
             println!("Dimensions: {}x{}", image.width(), image.height());
-            let orig_width = image.width().clone();
+            let orig_width = image.width();
             image.uniform_scale_width(orig_width / 5, true);
             let palette = image.generate_image_palette(10, 16);
             println!("Palette: {:?}", palette);
@@ -415,7 +415,7 @@ mod tests {
         {
             let mut image = ProcessedImage::new("./assets/test_img_1.jpg").unwrap();
             println!("Dimensions: {}x{}", image.width(), image.height());
-            let orig_width = image.width().clone();
+            let orig_width = image.width();
             image.uniform_scale_width(orig_width / 2, true);
             let palette = image.generate_image_palette(10, 8);
             image.apply_palette(&palette);
@@ -424,7 +424,7 @@ mod tests {
         {
             let mut image = ProcessedImage::new("./assets/test_img_2.jpg").unwrap();
             println!("Dimensions: {}x{}", image.width(), image.height());
-            let orig_width = image.width().clone();
+            let orig_width = image.width();
             image.uniform_scale_width(orig_width / 5, true);
             let palette = image.generate_image_palette(10, 16);
             println!("Palette: {:?}", palette);
@@ -436,7 +436,7 @@ mod tests {
         {
             let mut image = ProcessedImage::new("./assets/test_img_2.jpg").unwrap();
             println!("Dimensions: {}x{}", image.width(), image.height());
-            let orig_width = image.width().clone();
+            let orig_width = image.width();
             image.uniform_scale_width(orig_width / 2, true);
             let palette = image.generate_image_palette(10, 8);
             image.apply_palette(&palette);
